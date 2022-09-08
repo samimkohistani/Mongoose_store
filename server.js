@@ -32,6 +32,8 @@ app.get("/", function (req, res){
     res.send("Welcome to mongoose_store")
 });
 
+// see route
+
 app.get("/products/seed" , function (req, res){
     Product.deleteMany({}, (error, Products) => {});
     Product.create([

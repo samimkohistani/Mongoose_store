@@ -9,10 +9,14 @@
 <body>
     <h1><%=product.name%></h1>
     <img src="<%=product.img%>" alt="">
-    <p>Price: <%=product.price%></p> <br>
-    <p>Quantity: <%=product.qty%></p>
+    <p class="price">Price: <%=product.price%></p> <br>
+    <p class="qty">Quantity: <%=product.qty%></p>
     <a href="/products">Return to Index</a>
-    <a href="/products/edit">Edit Product</a>
-    <button>Delete</button>
+    <a href="/products/<%=product.id%>/edit">Edit Product</a>
+    <% if (product.qty > 0) { %>
+        <button>BUY</button>
+   <% } else { %>
+    <p> This item is out of stock. </p>
+   <% } %>
 </body>
 </html>

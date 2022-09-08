@@ -1,38 +1,14 @@
-// Dependencies
-const express = require('express');
-const app = express();
-require('dotenv').config();
-const mongoose = require('mongoose');
-const Product = require("./models/products");
-const methodOverride = require("method-override");
-
-
-// middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
+const express = require("express");
+const productRouter = express.Router();
+const Product = require("../models/products");
 
 
 
-// Database Connection
-mongoose.connect(process.env.DATABASE_URL, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true
-});
+module.exports - productRouter;
 
-// Database Connection Error/Success
-// Define callback functions for various events
-const db = mongoose.connection
-db.on('error', (err) => console.log(err.message + ' is mongo not running?'));
-db.on('connected', () => console.log('mongo connected'));
-db.on('disconnected', () => console.log('mongo disconnected'));
+// seed route
 
-//testing server
-
-app.get("/", function (req, res){
-    res.send("Welcome to mongoose_store")
-});
-
-app.get("/products/seed" , function (req, res){
+productRouter.get("/products/seed" , function (req, res){
     Product.deleteMany({}, (error, Products) => {});
     Product.create([
         {
@@ -60,13 +36,11 @@ app.get("/products/seed" , function (req, res){
     }
 
     )
-});
+})
 
+// INDEX
 
-
-//Index
-
-app.get("/products" , function (req, res){
+productRouter.get("/products" , function (req, res){
     Product.find({}, (error, allProducts)=> {
         res.render("index.ejs" , {
             products: allProducts,
@@ -74,46 +48,45 @@ app.get("/products" , function (req, res){
     });
 });
 
-//New
+// NEW
 
-
-app.get("/products/new" , function (req, res){
+productRouter.get("/products/new" , function (req, res){
     res.render("new.ejs")
 });
-
 // DELETE
 
-
-app.delete("/products/:id" , (req, res)=>{
+productRouter.delete("/products/:id" , (req, res)=>{
 	// res.send("deleting...")
 	Product.findByIdAndRemove(req.params.id, (err, data) => {
 		res.redirect("/products")
-	});
-});
+	})
+})
 
 // UPDATE
 
-app.put("/products/:id" , function (req , res){
+productRouter.put("/products/:id" , function (req , res){
 
 	Product.findByIdAndUpdate(req.params.id, req.body, {
 		new:true,
 	}, (error, updatedBook) => {
 		res.redirect(`/products/${req.params.id}`)
-	});
-});
+	})
+})
+
+
 
 // CREATE
 
-app.post("/products" , function (req, res){
+productRouter.post("/products" , function (req, res){
     Product.create(req.body, (error, createdProduct) => {
         // res.send(createdProduct)
-        res.redirect("/products")
+        res.redirect("/products");
     });
 });
 
-//Edit
+// EDIT
 
-app.get("/products/:id/edit" , (req, res)=>{
+productRouter.get("/products/:id/edit" , (req, res)=>{
 	Product.findById(req.params.id, (error, foundProduct)=>{
 		res.render("edit.ejs" , {
 			product: foundProduct,
@@ -121,9 +94,9 @@ app.get("/products/:id/edit" , (req, res)=>{
 	});
 });
 
+// SHOW
 
-//Show
-app.get("/products/:id", (req, res)=>{
+productRouter.get("/products/:id", (req, res)=>{
     Product.findById(req.params.id, (err, foundProduct)=>{
         res.render("show.ejs" , {
             product: foundProduct,
@@ -131,6 +104,10 @@ app.get("/products/:id", (req, res)=>{
     });
 });
 
-// Listener
-const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`server is listning on port: ${PORT}`));
+// LISTENER
+const PORT = process.env.PORT; // calls port variable from .env to protect our data
+// note to self: nwws to call this variable AFtER requiring .env or it will show up as undefined
+
+productRouter.listen(PORT, function(){
+    console.log(`Let's start selling on port ${PORT}`)
+});
